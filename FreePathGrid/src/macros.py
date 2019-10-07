@@ -1,3 +1,17 @@
+"""
+Filename    : macros.py
+Created By  : Rahul Kedia
+Team        : OpenCV - AEV
+Institute   : IIT (ISM) Dhanbad
+Created On  : 02/10/19
+Description : This file contains variables which act as macros
+              in the source code. Purpose of this file is to make
+              the code modular and also it makes easier to change
+              few parameters of the code at any time according to
+              our requirements.
+"""
+
+
 # New Width of frame
 NEW_WIDTH = 640
 
