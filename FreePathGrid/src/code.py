@@ -25,12 +25,18 @@ def CaptureVideo():
 def InitialiseAlgo(Frame):
     Frame = Resize(Frame)
 
-    Frame = ApplyThresholding(Frame)
+    cv2.imshow('InputFrame', Frame)
+
+    if FreePathGrid.src.macros.THRESH_OR_CANNY == 1:
+        Frame = ApplyThresholding(Frame)
+
+    elif FreePathGrid.src.macros.THRESH_OR_CANNY == 0:
+        Frame = ApplyCanny(Frame)
 
 #    TestPixelValues(Frame)
     Frame = DrawLines(Frame)
 
-    cv2.imshow('Frame', Frame)
+    cv2.imshow('ProcessedFrame', Frame)
 
 
 def Resize(Frame):
@@ -52,6 +58,10 @@ def ApplyThresholding(Frame):
     return ThresholdFrame
 
 
+def ApplyCanny(Frame):
+    return cv2.Canny(Frame, 100, 200)
+
+
 def DrawLines(Frame):
     LineLength = [0] * int(FreePathGrid.src.macros.NEW_WIDTH / FreePathGrid.src.macros.DISTANCE_BTW_LINES)
 
@@ -65,7 +75,7 @@ def DrawSingleLine(Frame, LineLength, i):
     HeightOfFrame = Frame.shape[0]
     LineLength[i] = FindTopEnd(Frame, (i * FreePathGrid.src.macros.DISTANCE_BTW_LINES))
     cv2.line(Frame, ((i * FreePathGrid.src.macros.DISTANCE_BTW_LINES), (HeightOfFrame - 1)), \
-             ((i * FreePathGrid.src.macros.DISTANCE_BTW_LINES), (HeightOfFrame - LineLength[i])), 0, 1)
+             ((i * FreePathGrid.src.macros.DISTANCE_BTW_LINES), (HeightOfFrame - LineLength[i])), FreePathGrid.src.macros.BLACK_PIXEL_VALUE, 1)
 
 
 def FindTopEnd(Frame, i):
@@ -75,8 +85,8 @@ def FindTopEnd(Frame, i):
         # cv2.line(Frame, (i, (HeightOfFrame - 1)), (i, (HeightOfFrame - j)), 0, 1)
         if Frame[(HeightOfFrame - j - 1), i] == FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
             # print(Frame[(HeightOfFrame - j - 1), i])
-            if Frame[(HeightOfFrame - j - FreePathGrid.src.macros.PIXEL_THRESH - 1), i] == FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
-                return j
+#            if Frame[(HeightOfFrame - j - FreePathGrid.src.macros.PIXEL_THRESH - 1), i] == FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
+            return j
     return HeightOfFrame
 
 
