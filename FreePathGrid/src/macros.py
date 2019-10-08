@@ -27,14 +27,14 @@ WAITKEY_VALUE = 1
 
 
 # Threshold or canny
-THRESH_OR_CANNY = 1                 # 1 for Threshold
+TYPE_OF_FILTER = 1                 # 1 for Threshold
                                     # 0 for Canny
 
 
 # Black Pixel Value (For obstacle)
-if THRESH_OR_CANNY == 1:
+if TYPE_OF_FILTER == 1:
     BLACK_PIXEL_VALUE = 0               # 0 for threshold
                                           # 255 for canny
 
-elif THRESH_OR_CANNY == 0:
+elif TYPE_OF_FILTER == 0:
     BLACK_PIXEL_VALUE = 255

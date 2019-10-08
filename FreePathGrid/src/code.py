@@ -55,11 +55,7 @@ def InitialiseAlgo(Frame):
 
     cv2.imshow('InputFrame', Frame)
 
-    if FreePathGrid.src.macros.THRESH_OR_CANNY == 1:
-        Frame = ApplyThresholding(Frame)
-
-    elif FreePathGrid.src.macros.THRESH_OR_CANNY == 0:
-        Frame = ApplyCanny(Frame)
+    Frame = ApplyFilter(Frame)
 
     #    TestPixelValues(Frame)
     Frame = DrawLines(Frame)
@@ -85,33 +81,52 @@ def Resize(Frame):
 
 
 """
-Function        : ApplyThresholding
+Function        : ApplyFilter
 Parameters      : Frame - Mat type, contains input frame to be processed
                   GrayFrame - Mat type, contains the grayscale image of the input
-                  ret - Bool type, contains the status of Threshold image 
+                  ret - Bool type, contains the status of filter on image 
                         (Success or not)
-                  ThresholdFrame - Mat type, contains the threshold image
+                  FilteredFrame - Mat type, contains the image after filter
 Description     : This function applies thersholding on the input image.
 Return          : ThresholdFrame - threshold image of the input                  
 """
-def ApplyThresholding(Frame):
-    GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
+def ApplyFilter(Frame):
 
-    ret, ThresholdFrame = cv2.threshold(GrayFrame, 100, 255, cv2.THRESH_BINARY)
-    if not ret:
-        print('Cannot apply thresholding')
+    # Global Thresholding
+    if FreePathGrid.src.macros.TYPE_OF_FILTER == 0:
+        GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
+        ret, FilteredFrame = cv2.threshold(GrayFrame, 100, 255, cv2.THRESH_BINARY)
+        if not ret:
+            print('Cannot apply Filter')
 
-    return ThresholdFrame
+    # Adaptive Mean Thresholding
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 1:
+        FilteredFrame = cv2.adaptiveThreshold(Frame, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
+                                              cv2.THRESH_BINARY, 11, 2)
 
+    # Adaptive Gaussian Thresholding
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 2:
+        FilteredFrame = cv2.adaptiveThreshold(Frame, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
+                                              cv2.THRESH_BINARY, 11, 2)
 
-"""
-Function        : ApplyCanny
-Parameters      : Frame - Mat type, contains input frame to be processed
-Description     : This function applies canny edge detection on the input image.
-Return          : Canny image of the input                  
-"""
-def ApplyCanny(Frame):
-    return cv2.Canny(Frame, 100, 200)
+    # Otsu's Thresholding
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 3:
+        ret, th2 = cv2.threshold(Frame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        if not ret:
+            print('Cannot apply Filter')
+
+    # Otsu's thresholding after Gaussian filtering
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 4:
+        blur = cv2.GaussianBlur(Frame (5, 5), 0)
+        ret, th3 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        if not ret:
+            print('Cannot apply Filter')
+
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 5:
+
+    cv2.Canny(Frame, 100, 200)
+
+    return FilteredFrame
 
 
 """
