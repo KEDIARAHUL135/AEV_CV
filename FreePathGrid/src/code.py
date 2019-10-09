@@ -98,16 +98,19 @@ def ApplyFilter(Frame):
         ret, FilteredFrame = cv2.threshold(GrayFrame, 100, 255, cv2.THRESH_BINARY)
         if not ret:
             print('Cannot apply Filter')
-
+        return FilteredFrame
+    
     # Adaptive Mean Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 1:
         GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
         FilteredFrame = cv2.adaptiveThreshold(GrayFrame, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 6)
+        return FilteredFrame
 
     # Adaptive Gaussian Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 2:
         GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
         FilteredFrame = cv2.adaptiveThreshold(GrayFrame, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 3, 6)
+        return FilteredFrame
 
     # Otsu's Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 3:
@@ -115,6 +118,7 @@ def ApplyFilter(Frame):
         ret, FilteredFrame = cv2.threshold(GrayFrame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if not ret:
             print('Cannot apply Filter')
+        return FilteredFrame
 
     # Otsu's thresholding after Gaussian filtering
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 4:
@@ -123,10 +127,12 @@ def ApplyFilter(Frame):
         ret, FilteredFrame = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if not ret:
             print('Cannot apply Filter')
+        return FilteredFrame
 
     # Canny Edge Detection
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 5:
         FilteredFrame = cv2.Canny(Frame, 100, 200)
+        return FilteredFrame
 
     # Laplacian Gradient
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 6:
@@ -134,6 +140,7 @@ def ApplyFilter(Frame):
         gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
         dst = cv2.Laplacian(gray, cv2.CV_16S, ksize=3)
         FilteredFrame = cv2.convertScaleAbs(dst)
+        return FilteredFrame
 
     # Sobel Gradient
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 7:
@@ -144,6 +151,7 @@ def ApplyFilter(Frame):
         abs_grad_x = cv2.convertScaleAbs(grad_x)
         abs_grad_y = cv2.convertScaleAbs(grad_y)
         FilteredFrame = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
+        return FilteredFrame
 
     return FilteredFrame
 
