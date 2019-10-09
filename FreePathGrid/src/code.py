@@ -14,7 +14,8 @@ import cv2
 
 """
 Function        : CaptureVideo
-Parameters      : ret - bool type, stores the status of cap.read 
+Parameters      : VideoPath - string type, contains the path of input video 
+                  ret - bool type, stores the status of cap.read 
                         (the image is read or not)
                   InputFrame - Mat type, Stores the input image 
                                from the video stream
@@ -24,8 +25,8 @@ Return          : NULL
 """
 
 
-def CaptureVideo():
-    cap = cv2.VideoCapture('C:/Users/HP/Videos/InputVideo.avi')
+def CaptureVideo(VideoPath):
+    cap = cv2.VideoCapture(VideoPath)
 
     while cap.isOpened():
         ret, InputFrame = cap.read()
@@ -101,30 +102,49 @@ def ApplyFilter(Frame):
 
     # Adaptive Mean Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 1:
-        FilteredFrame = cv2.adaptiveThreshold(Frame, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
-                                              cv2.THRESH_BINARY, 11, 2)
+        GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
+        FilteredFrame = cv2.adaptiveThreshold(GrayFrame, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 3, 6)
 
     # Adaptive Gaussian Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 2:
-        FilteredFrame = cv2.adaptiveThreshold(Frame, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
-                                              cv2.THRESH_BINARY, 11, 2)
+        GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
+        FilteredFrame = cv2.adaptiveThreshold(GrayFrame, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 3, 6)
 
     # Otsu's Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 3:
-        ret, th2 = cv2.threshold(Frame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
+        ret, FilteredFrame = cv2.threshold(GrayFrame, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if not ret:
             print('Cannot apply Filter')
 
     # Otsu's thresholding after Gaussian filtering
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 4:
-        blur = cv2.GaussianBlur(Frame (5, 5), 0)
-        ret, th3 = cv2.threshold(blur, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        blur = cv2.GaussianBlur(Frame, (5, 5), 0)
+        gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
+        ret, FilteredFrame = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if not ret:
             print('Cannot apply Filter')
 
+    # Canny Edge Detection
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 5:
+        FilteredFrame = cv2.Canny(Frame, 100, 200)
 
-    cv2.Canny(Frame, 100, 200)
+    # Laplacian Gradient
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 6:
+        blur = cv2.GaussianBlur(Frame, (3, 3), 0)
+        gray = cv2.cvtColor(blur, cv2.COLOR_BGR2GRAY)
+        dst = cv2.Laplacian(gray, cv2.CV_16S, ksize=3)
+        FilteredFrame = cv2.convertScaleAbs(dst)
+
+    # Sobel Gradient
+    elif FreePathGrid.src.macros.TYPE_OF_FILTER == 7:
+        src = cv2.GaussianBlur(Frame, (3, 3), 0)
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        grad_x = cv2.Sobel(gray, cv2.CV_16S, 1, 0, ksize=3, scale=1, delta=0, borderType=cv2.BORDER_DEFAULT)
+        grad_y = cv2.Sobel(gray, cv2.CV_16S, 0, 1, ksize=3, scale=1, delta=0, borderType=cv2.BORDER_DEFAULT)
+        abs_grad_x = cv2.convertScaleAbs(grad_x)
+        abs_grad_y = cv2.convertScaleAbs(grad_y)
+        FilteredFrame = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
 
     return FilteredFrame
 
@@ -185,11 +205,19 @@ def FindTopEnd(Frame, LineXPos):
     # print(HeightOfFrame - src.macros.PIXEL_THRESH)
     for j in range(HeightOfFrame - FreePathGrid.src.macros.PIXEL_THRESH):
         # cv2.line(Frame, (LineXPos, (HeightOfFrame - 1)), (LineXPos, (HeightOfFrame - j)), 0, 1)
-        if Frame[(HeightOfFrame - j - 1), LineXPos] == FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
-            # print(Frame[(HeightOfFrame - j - 1), LineXPos])
-            # if Frame[(HeightOfFrame - j - FreePathGrid.src.macros.PIXEL_THRESH - 1), LineXPos] ==\
-            # FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
-            return j
+        if FreePathGrid.src.macros.TYPE_OF_FILTER == 6 or FreePathGrid.src.macros.TYPE_OF_FILTER == 7:
+            if Frame[(HeightOfFrame - j - 1), LineXPos] >= FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
+                # print(Frame[(HeightOfFrame - j - 1), LineXPos])
+                # if Frame[(HeightOfFrame - j - FreePathGrid.src.macros.PIXEL_THRESH - 1), LineXPos] ==\
+                # FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
+                return j
+        else:
+            if Frame[(HeightOfFrame - j - 1), LineXPos] == FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
+                # print(Frame[(HeightOfFrame - j - 1), LineXPos])
+                # if Frame[(HeightOfFrame - j - FreePathGrid.src.macros.PIXEL_THRESH - 1), LineXPos] ==\
+                # FreePathGrid.src.macros.BLACK_PIXEL_VALUE:
+                return j
+
     return HeightOfFrame
 
 
