@@ -99,7 +99,7 @@ def ApplyFilter(Frame):
         if not ret:
             print('Cannot apply Filter')
         return FilteredFrame
-    
+
     # Adaptive Mean Thresholding
     elif FreePathGrid.src.macros.TYPE_OF_FILTER == 1:
         GrayFrame = cv2.cvtColor(Frame, cv2.COLOR_BGR2GRAY)
@@ -152,8 +152,6 @@ def ApplyFilter(Frame):
         abs_grad_y = cv2.convertScaleAbs(grad_y)
         FilteredFrame = cv2.addWeighted(abs_grad_x, 0.5, abs_grad_y, 0.5, 0)
         return FilteredFrame
-
-    return FilteredFrame
 
 
 """
