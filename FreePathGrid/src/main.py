@@ -10,4 +10,4 @@ Description : This file initialises the source code of the Free Path Grid algo.
 
 from FreePathGrid.src.code import CaptureVideo
 
-CaptureVideo("C:/Users/Kedia/Desktop/InputVideo1.avi")
+CaptureVideo()

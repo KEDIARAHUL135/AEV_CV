@@ -14,8 +14,7 @@ import cv2
 
 """
 Function        : CaptureVideo
-Parameters      : VideoPath - string type, contains the path of input video 
-                  ret - bool type, stores the status of cap.read 
+Parameters      : ret - bool type, stores the status of cap.read 
                         (the image is read or not)
                   InputFrame - Mat type, Stores the input image 
                                from the video stream
@@ -25,8 +24,8 @@ Return          : NULL
 """
 
 
-def CaptureVideo(VideoPath):
-    cap = cv2.VideoCapture(VideoPath)
+def CaptureVideo():
+    cap = cv2.VideoCapture(FreePathGrid.src.macros.VIDEO_PATH)
 
     while cap.isOpened():
         ret, InputFrame = cap.read()

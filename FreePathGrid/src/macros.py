@@ -12,6 +12,10 @@ Description : This file contains variables which act as macros
 """
 
 
+# Input Video Path
+VIDEO_PATH = "C:/Users/Kedia/Desktop/InputVideo1.avi"
+
+
 # New Width of frame
 NEW_WIDTH = 640
 
